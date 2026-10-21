@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Design tokens from the Daftari design canvas */
+@theme {
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+
+  --color-ink: #0e1726;
+  --color-ink-2: #3b4658;
+  --color-muted: #5b6576;
+  --color-faint: #8a93a3;
+
+  --color-canvas: #eef1f5;
+  --color-subtle: #f7f8fa;
+  --color-key: #f4f6f9;
+  --color-line: #d9dee6;
+  --color-line-soft: #e4e8ee;
+  --color-line-strong: #c5ccd8;
+
+  --color-navy: #0e1726;
+  --color-navy-2: #17233a;
+  --color-navy-line: #2a3a57;
+  --color-navy-text: #b6c0cf;
+
+  --color-brand: #1f3fd1;
+  --color-brand-dark: #142c9e;
+  --color-brand-bright: #3d5afe;
+  --color-brand-soft: #e8edff;
+  --color-brand-tint: #f5f7ff;
+
+  --color-ok: #0f7a3e;
+  --color-ok-soft: #e3f4e9;
+  --color-warn: #9a5b00;
+  --color-warn-line: #e0a33a;
+  --color-warn-soft: #fff1d6;
+  --color-warn-tint: #fff6e5;
+  --color-bad: #b42318;
+  --color-bad-line: #e5a29c;
+  --color-bad-soft: #fde7e5;
+  --color-bad-tint: #fff5f4;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
