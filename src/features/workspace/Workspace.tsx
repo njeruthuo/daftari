@@ -7,6 +7,7 @@ import { applyKey, Button, Icon, Modal, Toast, type KeypadKey } from '@/componen
 import { selectCurrentOfficial } from '@/features/auth/authSlice'
 import { NEXT_ATTENDANCE } from '@/features/sessions/attendance'
 import { clearDraft, saveDraft, setAttendance } from '@/features/sessions/sessionsSlice'
+import NewLoanActions from '@/features/loans/NewLoanActions'
 import { useToast } from '@/hooks/useToast'
 import { memberSavings } from '@/lib/balances'
 import { formatDate } from '@/lib/dates'
@@ -30,7 +31,8 @@ export default function Workspace() {
   const drafts = useAppSelector((state) => state.sessions.drafts[sessionId] ?? {})
   const { members, group } = useAppSelector((state) => state.data)
   const { entries, loans } = useAppSelector((state) => state.ledger)
-  const allDeductions = useAppSelector((state) => state.settings.deductions)
+  const settings = useAppSelector((state) => state.settings)
+  const allDeductions = settings.deductions
   const official = useAppSelector(selectCurrentOfficial)
   const leadName = useAppSelector((state) => state.data.members.find((m) => m.id === session?.leadId)?.name)
 
@@ -184,6 +186,25 @@ export default function Workspace() {
                 onAutoSavings={() => setForm({ ...form, savings: null })}
                 st={st}
                 lt={lt}
+                loanActions={
+                  <NewLoanActions
+                    member={member}
+                    newLoan={form.newLoan}
+                    st={st}
+                    lt={lt}
+                    rates={{
+                      gumbatoPct: settings.gumbato.chargePct,
+                      gumbatoFee: settings.gumbato.formFee,
+                      longTermPct: settings.longTerm.interestPct,
+                      feePer10k: settings.longTerm.feePer10k,
+                    }}
+                    onIssue={(newLoan) => setForm({ ...form, newLoan })}
+                    onRepayInstead={(type, amount) => {
+                      setForm({ ...form, [type === GUMBATO ? 'repayST' : 'repayLT']: String(amount) })
+                      setTarget(type === GUMBATO ? 'repayST' : 'repayLT')
+                    }}
+                  />
+                }
               />
               <EntryFooter
                 math={math}

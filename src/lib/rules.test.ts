@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { seed } from '@/data/seed'
 import type { EntryForm } from '@/types'
 import { calcEntry, newEntryForm } from './entry'
-import { gumbatoTerms, longTermFormFee, longTermTerms } from './loans'
+import { activeLoan, gumbatoTerms, loanStatus, longTermFormFee, longTermTerms } from './loans'
 
 const { deductions, gumbato, longTerm } = seed.settings
+const { loans } = seed.ledger
 
 function form(patch: Partial<EntryForm>): EntryForm {
   return { ...newEntryForm(deductions), ...patch }
@@ -55,5 +56,28 @@ describe('loans', () => {
     expect(longTermFormFee(10000, 100)).toBe(100)
     expect(longTermFormFee(100000, 100)).toBe(1000)
     expect(longTermFormFee(15500, 100)).toBe(160)
+  })
+})
+
+describe('loan status', () => {
+  it('flags a Gumbato overdue after 3 repayments with debt left (screen 08b)', () => {
+    const hellen = loans.find((l) => l.memberId === 'M016')!
+    const status = loanStatus(hellen, [], '2026-10-20')
+    expect(status.balance).toBe(1600)
+    expect(status.overdue).toBe(true)
+  })
+
+  it('counts repayments recorded in entries (screen 10)', () => {
+    const lt = loans.find((l) => l.memberId === 'M002')!
+    const repayment = { kind: 'entry', ltLoanId: lt.id, repayLT: 9500, stLoanId: null, repayST: 0 }
+    const status = loanStatus(lt, [repayment as never], '2026-10-20')
+    expect(status.balance).toBe(28500)
+    expect(status.count).toBe(9)
+  })
+
+  it('finds no active loan once it is cleared', () => {
+    const grace = loans.find((l) => l.memberId === 'M004')!
+    const cleared = { kind: 'entry', stLoanId: grace.id, repayST: 4000, ltLoanId: null, repayLT: 0 }
+    expect(activeLoan(loans, [cleared as never], 'M004', 'gumbato')).toBeNull()
   })
 })
