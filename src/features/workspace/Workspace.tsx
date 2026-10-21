@@ -13,7 +13,7 @@ import { memberSavings } from '@/lib/balances'
 import { isActive } from '@/lib/members'
 import { formatDate } from '@/lib/dates'
 import { calcEntry, newEntryForm } from '@/lib/entry'
-import { activeLoan, GUMBATO, LONG_TERM } from '@/lib/loans'
+import { activeLoan, GUMBATO, LONG_TERM, repaymentError } from '@/lib/loans'
 import { fmt } from '@/lib/money'
 import type { EntryForm } from '@/types'
 import EntryFooter from './EntryFooter'
@@ -65,9 +65,7 @@ export default function Workspace() {
   const lt = activeLoan(loans, entries, member.id, LONG_TERM)
   const next = rows.slice(rows.indexOf(row) + 1).concat(rows).find((r) => !r.entry && r.member.id !== member.id)
 
-  let error: string | null = null
-  if (st && math.repayST > st.balance) error = `Gumbato repayment is more than the ${fmt(st.balance)} owed`
-  if (lt && math.repayLT > lt.balance) error = `Long-term repayment is more than the ${fmt(lt.balance)} owed`
+  const error = repaymentError(math.repayST, st) ?? repaymentError(math.repayLT, lt)
 
   // The form lives in the session's drafts, so nothing is lost when switching members or closing the app.
   function setForm(next: EntryForm) {

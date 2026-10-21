@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { seed } from '@/data/seed'
 import type { EntryForm } from '@/types'
 import { calcEntry, newEntryForm } from './entry'
-import { activeLoan, gumbatoTerms, loanStatus, longTermFormFee, longTermTerms } from './loans'
+import { activeLoan, gumbatoTerms, loanStatus, longTermFormFee, longTermTerms, minimumRepayment, repaymentError } from './loans'
 
 const { deductions, gumbato, longTerm } = seed.settings
 const { loans } = seed.ledger
@@ -79,5 +79,35 @@ describe('loan status', () => {
     const grace = loans.find((l) => l.memberId === 'M004')!
     const cleared = { kind: 'entry', stLoanId: grace.id, repayST: 4000, ltLoanId: null, repayLT: 0 }
     expect(activeLoan(loans, [cleared as never], 'M004', 'gumbato')).toBeNull()
+  })
+})
+
+describe('repayment rules', () => {
+  const st = activeLoan(loans, [], 'M004', 'gumbato')! // 4,000 owed, suggested 1,834
+  const lt = activeLoan(loans, [], 'M002', 'longterm')! // 38,000 owed, 9,500 a month
+
+  it('lets Gumbato be paid less or more than the suggested installment, up to the balance', () => {
+    expect(repaymentError(500, st)).toBeNull()
+    expect(repaymentError(3000, st)).toBeNull()
+    expect(repaymentError(4000, st)).toBeNull()
+    expect(repaymentError(4001, st)).toContain('more than the 4,000 owed')
+  })
+
+  it('needs at least the monthly installment on a long-term loan', () => {
+    expect(minimumRepayment(lt)).toBe(9500)
+    expect(repaymentError(9000, lt)).toContain('at least 9,500')
+    expect(repaymentError(9500, lt)).toBeNull()
+    expect(repaymentError(20000, lt)).toBeNull()
+    expect(repaymentError(38001, lt)).toContain('more than the 38,000 owed')
+  })
+
+  it('lowers the long-term minimum to the balance near the end', () => {
+    const last = { ...lt, balance: 4000 }
+    expect(minimumRepayment(last)).toBe(4000)
+    expect(repaymentError(4000, last)).toBeNull()
+  })
+
+  it('allows skipping a repayment this month', () => {
+    expect(repaymentError(0, lt)).toBeNull()
   })
 })

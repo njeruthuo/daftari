@@ -21,7 +21,7 @@ export default function AllocationRow({ icon, label, sub, value, active, disable
       </span>
       <div className="min-w-0 flex-1">
         <div className={`text-[15px] font-semibold ${disabled ? 'text-muted' : ''}`}>{label}</div>
-        <div className={`truncate text-xs font-medium ${disabled ? 'text-muted' : 'text-ink-2'}`}>{sub}</div>
+        <div className={`text-xs font-medium leading-snug ${disabled ? 'text-muted' : 'text-ink-2'}`}>{sub}</div>
       </div>
       {auto && <Badge tone="brand">AUTO</Badge>}
       {action && !disabled && (

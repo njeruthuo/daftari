@@ -1,5 +1,6 @@
 import type { Entry, GumbatoSettings, Loan, LoanTerms, LoanType, LongTermSettings } from '@/types'
 import { addMonths, todayISO } from './dates'
+import { fmt } from './money'
 
 export const GUMBATO: LoanType = 'gumbato'
 export const LONG_TERM: LoanType = 'longterm'
@@ -56,6 +57,22 @@ export function longTermTerms(
     issuedOn,
     deadline: addMonths(issuedOn, months),
   }
+}
+
+// Smallest repayment allowed this month. Gumbato takes any amount;
+// long-term needs at least the monthly installment, or the balance if that is less.
+export function minimumRepayment(loan: ActiveLoan): number {
+  return loan.type === GUMBATO ? 0 : Math.min(loan.installment, loan.balance)
+}
+
+// Why a repayment amount is not allowed, or null. Zero means "not repaying this month".
+export function repaymentError(amount: number, loan: ActiveLoan | null): string | null {
+  if (!loan || amount === 0) return null
+  const name = loan.type === GUMBATO ? 'Gumbato' : 'Long-term'
+  if (amount > loan.balance) return `${name} repayment is more than the ${fmt(loan.balance)} owed`
+  const min = minimumRepayment(loan)
+  if (amount < min) return `${name} repayment must be at least ${fmt(min)}`
+  return null
 }
 
 // Balance and repayment count for one loan, from ledger entries.
