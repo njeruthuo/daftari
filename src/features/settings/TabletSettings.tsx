@@ -1,5 +1,6 @@
 import { useAppSelector } from '@/app/hooks'
 import { clearState } from '@/app/storage'
+import { isActive } from '@/lib/members'
 import { Banner, Button, Card, MathRows } from '@/components/ui'
 import SettingsLayout from './SettingsLayout'
 
@@ -20,7 +21,8 @@ export default function TabletSettings() {
         <MathRows
           rows={[
             { label: 'Group', value: group.name },
-            { label: 'Members', value: String(members.length) },
+            { label: 'Active members', value: String(members.filter(isActive).length) },
+            { label: 'Revoked members', value: String(members.filter((m) => !isActive(m)).length) },
             { label: 'Sessions on this tablet', value: String(sessions.length) },
             { label: 'Entries on this tablet', value: String(entries.length) },
           ]}

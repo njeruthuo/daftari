@@ -17,6 +17,11 @@ export interface Member {
   name: string
   since: string
   openingSavings: number
+  phone?: string
+  // Missing on older saved data, which means active.
+  status?: 'active' | 'revoked'
+  revokedAt?: string | null
+  revokedReason?: string
 }
 
 export interface Official {

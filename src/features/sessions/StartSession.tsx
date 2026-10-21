@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import TopBar, { TaskScreen } from '@/components/layout/TopBar'
 import { Badge, Button, Card, CardHeader, Field, Icon, SectionLabel } from '@/components/ui'
 import { monthName, todayISO } from '@/lib/dates'
+import { isActive } from '@/lib/members'
 import type { Attendance } from '@/types'
 import { ATTENDANCE_LOOK, NEXT_ATTENDANCE } from './attendance'
 import { selectOpenSession, startSession } from './sessionsSlice'
@@ -11,7 +12,8 @@ import { selectOpenSession, startSession } from './sessionsSlice'
 export default function StartSession() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { group, members } = useAppSelector((state) => state.data)
+  const group = useAppSelector((state) => state.data.group)
+  const members = useAppSelector((state) => state.data.members).filter(isActive)
   const deductions = useAppSelector((state) => state.settings.deductions)
   const leadId = useAppSelector((state) => state.auth.memberId)
   const open = useAppSelector(selectOpenSession)

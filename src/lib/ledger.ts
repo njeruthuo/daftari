@@ -55,7 +55,7 @@ export function memberLedger(member: Member, entries: Entry[], loans: Loan[]): L
   let gumbato = openingOwed('gumbato')
   let longTerm = openingOwed('longterm')
   const rows: LedgerRow[] = [
-    { id: 'opening', date: '', ref: `OB-${member.id.slice(1)}`, description: 'Opening balance', detail: 'Migrated from paper passbook', cash: null, savings, gumbato, longTerm, kinds: ['opening'] },
+    { id: 'opening', date: '', ref: `OB-${member.id.slice(1)}`, description: 'Opening balance', detail: member.openingSavings || migrated.length ? 'Migrated from paper passbook' : 'Joined with no opening balance', cash: null, savings, gumbato, longTerm, kinds: ['opening'] },
   ]
 
   const mine = entries.filter((e) => e.memberId === member.id).sort((a, b) => a.at.localeCompare(b.at))
