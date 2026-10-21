@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
-import { useAppSelector } from '@/app/hooks'
+import { reinstateMember } from '@/app/dataSlice'
+import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import TopBar, { TaskScreen } from '@/components/layout/TopBar'
-import { Avatar, Badge, Button, Card, Segmented, StatTile } from '@/components/ui'
-import { shortDate } from '@/lib/dates'
+import { Avatar, Badge, Banner, Button, Card, Segmented, StatTile } from '@/components/ui'
+import { formatDate, shortDate } from '@/lib/dates'
 import { memberLedger, type LedgerKind } from '@/lib/ledger'
 import { activeLoan } from '@/lib/loans'
+import { isActive } from '@/lib/members'
 import { fmt } from '@/lib/money'
+import RevokeMemberModal from './RevokeMemberModal'
 
 type Filter = 'all' | LedgerKind
 
@@ -16,9 +19,11 @@ const COLS = 'grid grid-cols-[100px_90px_minmax(240px,3fr)_repeat(4,minmax(80px,
 export default function MemberLedger() {
   const { memberId = '' } = useParams()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const member = useAppSelector((state) => state.data.members.find((m) => m.id === memberId))
   const { entries, loans } = useAppSelector((state) => state.ledger)
   const [filter, setFilter] = useState<Filter>('all')
+  const [revoking, setRevoking] = useState(false)
 
   if (!member) return <Navigate to="/members" replace />
 
@@ -41,12 +46,30 @@ export default function MemberLedger() {
         <Card className="flex flex-wrap items-center gap-4 p-5">
           <Avatar name={member.name} />
           <div className="min-w-0 flex-1">
-            <h1 className="text-[22px] font-bold">{member.name}</h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-[22px] font-bold">{member.name}</h1>
+              {!isActive(member) && <Badge tone="bad">REVOKED</Badge>}
+            </div>
             <p className="text-[13px] text-ink-2">
-              {member.id} · Member since {shortDate(member.since)} · Opening balance migrated from passbook
+              {member.id}
+              {member.phone ? ` · ${member.phone}` : ''} · Member since {shortDate(member.since)}
             </p>
           </div>
+          {isActive(member) ? (
+            <Button variant="secondary" onClick={() => setRevoking(true)}>
+              Revoke member
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={() => dispatch(reinstateMember(member.id))}>
+              Reinstate
+            </Button>
+          )}
         </Card>
+        {!isActive(member) && (
+          <Banner tone="bad" title={`Revoked ${formatDate(member.revokedAt ?? null)}`}>
+            {member.revokedReason} Not included in new sessions. History below is kept.
+          </Banner>
+        )}
         <div className="grid gap-4 sm:grid-cols-3">
           <StatTile label="Savings" value={`KES ${fmt(last.savings)}`} />
           <StatTile label="Gumbato" value={`KES ${fmt(st?.balance ?? 0)}`} sub={st ? `${st.count} of ${st.months} repaid${st.overdue ? ' · overdue' : ''}` : 'No active loan'} tone={st?.overdue ? 'bad' : 'neutral'} />
@@ -102,6 +125,7 @@ export default function MemberLedger() {
           </div>
         </Card>
       </div>
+      {revoking && <RevokeMemberModal member={member} onClose={() => setRevoking(false)} />}
     </TaskScreen>
   )
 }

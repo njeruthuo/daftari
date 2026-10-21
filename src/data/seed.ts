@@ -19,6 +19,7 @@ const members: Member[] = NAMES.map((name, i) => ({
   name,
   since: `${2019 + (i % 5)}-0${1 + (i % 9)}-01`,
   openingSavings: 20000 + ((i * 3700) % 30000),
+  status: 'active',
 }))
 
 const deductions: Deduction[] = [

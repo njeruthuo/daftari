@@ -10,6 +10,7 @@ import { clearDraft, saveDraft, setAttendance } from '@/features/sessions/sessio
 import NewLoanActions from '@/features/loans/NewLoanActions'
 import { useToast } from '@/hooks/useToast'
 import { memberSavings } from '@/lib/balances'
+import { isActive } from '@/lib/members'
 import { formatDate } from '@/lib/dates'
 import { calcEntry, newEntryForm } from '@/lib/entry'
 import { activeLoan, GUMBATO, LONG_TERM } from '@/lib/loans'
@@ -37,11 +38,13 @@ export default function Workspace() {
   const leadName = useAppSelector((state) => state.data.members.find((m) => m.id === session?.leadId)?.name)
 
   const sessionEntries = entries.filter((e) => e.sessionId === sessionId && e.kind === 'entry')
-  const rows: MemberRow[] = members.map((member) => {
-    const entry = sessionEntries.find((e) => e.memberId === member.id)
-    return { member, entry, status: memberStatus(entry, drafts[member.id]) }
-  })
-  const firstOpen = rows.find((r) => !r.entry)?.member.id ?? members[0].id
+  const rows: MemberRow[] = members
+    .map((member) => {
+      const entry = sessionEntries.find((e) => e.memberId === member.id)
+      return { member, entry, status: memberStatus(entry, drafts[member.id]) }
+    })
+    .filter((r) => isActive(r.member) || r.entry)
+  const firstOpen = rows.find((r) => !r.entry)?.member.id ?? rows[0]?.member.id ?? ''
 
   const [selectedId, setSelectedId] = useState(firstOpen)
   const [target, setTarget] = useState<KeypadTarget>('cash')

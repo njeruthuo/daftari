@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Avatar, Button, Icon, Keypad, StatusIcon, applyKey, type KeypadKey } from '@/components/ui'
 import { Logo } from '@/components/layout/SideNav'
 import { formatDate, formatTime } from '@/lib/dates'
+import { isActive } from '@/lib/members'
 import { count } from '@/lib/money'
 import { unlock } from './authSlice'
 
@@ -55,7 +56,7 @@ export default function PinUnlock() {
           <div className="flex flex-col gap-1">
             <span className="text-[34px] font-bold leading-tight">{group.name}</span>
             <span className="text-base text-navy-text">
-              {members.length} members · {group.meets} · {group.location}
+              {members.filter(isActive).length} members · {group.meets} · {group.location}
             </span>
           </div>
           <div className="flex flex-col gap-3 rounded-[14px] border border-navy-line bg-navy-2 p-5">

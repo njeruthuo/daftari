@@ -1,4 +1,5 @@
 import { useAppSelector } from '@/app/hooks'
+import { isActive } from '@/lib/members'
 import { sessionTotals } from '@/lib/session'
 
 // A session with its entries and totals, shared by the close, summary and reconciliation screens.
@@ -14,5 +15,5 @@ export function useSessionData(sessionId: string) {
   const unsynced = entries.filter((e) => e.sync !== 'synced').length
   const variance = session?.counted == null ? null : session.counted - totals.expected
 
-  return { session, entries, totals, processed, unsynced, variance, memberCount: members.length, draftCount: Object.keys(drafts).length }
+  return { session, entries, totals, processed, unsynced, variance, memberCount: members.filter(isActive).length, draftCount: Object.keys(drafts).length }
 }

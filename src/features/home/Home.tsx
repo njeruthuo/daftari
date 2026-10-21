@@ -6,6 +6,7 @@ import { selectCurrentOfficial } from '@/features/auth/authSlice'
 import SessionsTable, { varianceLabel } from '@/features/sessions/SessionsTable'
 import { groupTotals } from '@/lib/balances'
 import { formatDate, monthName, todayISO } from '@/lib/dates'
+import { isActive } from '@/lib/members'
 import { kes } from '@/lib/money'
 import { sessionTotals } from '@/lib/session'
 
@@ -23,6 +24,7 @@ export default function Home() {
   const sessions = useAppSelector((state) => state.sessions.list)
   const deductions = useAppSelector((state) => state.settings.deductions)
 
+  const activeCount = members.filter(isActive).length
   const totals = groupTotals(members, entries, loans)
   const open = sessions.find((s) => s.status === 'open')
   const last = sessions.filter((s) => s.status === 'closed').sort((a, b) => b.date.localeCompare(a.date))[0]
@@ -45,7 +47,7 @@ export default function Home() {
           <div className="text-sm font-semibold uppercase tracking-wider text-[#c9d3ff]">{open ? 'Meeting in progress' : "Today's meeting"}</div>
           <div className="mt-1 text-[26px] font-bold">{open ? open.name : `${monthName(todayISO())} Monthly Meeting`}</div>
           <div className="mt-1 text-[15px] text-[#dce3ff]">
-            {members.length} members · Defaults on: {defaults || 'none'}
+            {activeCount} members · Defaults on: {defaults || 'none'}
           </div>
         </div>
         <Button to={open ? `/sessions/${open.id}` : '/sessions/new'} variant="inverse" size="lg">
@@ -55,7 +57,7 @@ export default function Home() {
       </section>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatTile label="Total savings" value={kes(totals.savings)} sub={`${members.length} members`} />
+        <StatTile label="Total savings" value={kes(totals.savings)} sub={`${activeCount} active members`} />
         <StatTile
           label="Gumbato out"
           value={kes(totals.gumbato.amount)}
@@ -66,7 +68,7 @@ export default function Home() {
         {last ? (
           <StatTile
             label="Last session"
-            value={`${lastProcessed} of ${members.length}`}
+            value={`${lastProcessed} of ${activeCount}`}
             sub={`Variance ${varianceLabel((last.counted ?? lastTotals.expected) - lastTotals.expected).text}`}
             tone={last.counted === lastTotals.expected ? 'ok' : 'warn'}
           />

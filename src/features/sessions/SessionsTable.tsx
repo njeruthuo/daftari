@@ -1,3 +1,4 @@
+import { selectActiveCount } from '@/app/dataSlice'
 import { useAppSelector } from '@/app/hooks'
 import { Button, Card, CardHeader, Icon, StatusIcon } from '@/components/ui'
 import { formatDate } from '@/lib/dates'
@@ -17,7 +18,7 @@ export function varianceLabel(variance: number): { text: string; className: stri
 export default function SessionsTable({ sessions, limit }: { sessions: Session[]; limit?: number }) {
   const entries = useAppSelector((state) => state.ledger.entries)
   const loans = useAppSelector((state) => state.ledger.loans)
-  const memberCount = useAppSelector((state) => state.data.members.length)
+  const memberCount = useAppSelector(selectActiveCount)
   const closed = sessions
     .filter((s) => s.status === 'closed')
     .sort((a, b) => b.date.localeCompare(a.date))
