@@ -8,6 +8,9 @@ import EndSession from '@/features/sessions/EndSession'
 import Reconciliation from '@/features/sessions/Reconciliation'
 import SessionsPage from '@/features/sessions/SessionsPage'
 import StartSession from '@/features/sessions/StartSession'
+import DeductionsSettings from '@/features/settings/DeductionsSettings'
+import LoanSettings from '@/features/settings/LoanSettings'
+import TabletSettings from '@/features/settings/TabletSettings'
 import SyncEngine from '@/features/workspace/SyncEngine'
 import Workspace from '@/features/workspace/Workspace'
 
@@ -27,6 +30,10 @@ export default function App() {
           <Route path="/sessions/:sessionId/reconcile" element={<Reconciliation />} />
           <Route path="/members" element={<MembersPage />} />
           <Route path="/members/:memberId" element={<MemberLedger />} />
+          <Route path="/settings" element={<Navigate to="/settings/deductions" replace />} />
+          <Route path="/settings/deductions" element={<DeductionsSettings />} />
+          <Route path="/settings/loans" element={<LoanSettings />} />
+          <Route path="/settings/tablet" element={<TabletSettings />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
