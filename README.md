@@ -2,7 +2,32 @@
 
 Paperless chama meetings. Daftari replaces the paper register and passbooks a chama (savings group) uses at its monthly meeting. Officials record each member's cash, deductions, savings and loans on a tablet. The app works fully offline and syncs when a connection returns.
 
-> Status: design phase. The screens and rules below come from the [Daftari design canvas](https://claude.ai/artifact/UbkgxhEY5a5scknLDqVyVd). No application code exists yet.
+> Status: working prototype. The screens and rules below come from the [Daftari design canvas](https://claude.ai/artifact/UbkgxhEY5a5scknLDqVyVd). Data is stored in the browser's localStorage until the database is designed.
+
+## Development
+
+Requires Node 20+.
+
+```sh
+npm install
+npm run dev        # http://localhost:5173
+npm test           # money and loan rules
+npm run build      # type-check and production build
+```
+
+Demo officials (seed data in `src/data/seed.ts`): Wanjiru Kamau, PIN `1234`, and Achieng Otieno, PIN `2468`. To start over, use **Settings › This tablet › Reset demo data**.
+
+Stack: React 19, TypeScript, Redux Toolkit, React Router 7, Tailwind CSS 4, Vite, Vitest. Imports use the `@/` alias for `src/`.
+
+| Folder | Holds |
+| --- | --- |
+| `src/components/ui` | Shared UI kit: buttons, cards, keypad, amount fields, chips, modal. Every screen builds from these. |
+| `src/components/layout` | App shell, side nav, task-screen top bar |
+| `src/features/*` | One folder per area (auth, home, sessions, workspace, loans, members, settings) with its screens and Redux slice |
+| `src/lib` | Pure money, loan, session and ledger rules, with tests |
+| `src/types.ts` | Domain types; the starting point for the database schema |
+
+Sync is simulated: entries save as "Saved on device" and are marked synced about 2 seconds later while the browser is online. Switch the browser to offline in DevTools to see the offline states.
 
 ## Who it is for
 
