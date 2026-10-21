@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { AmountField, Card, Chip, Keypad, SectionLabel, type KeypadKey } from '@/components/ui'
 import type { EntryMath } from '@/lib/entry'
-import type { ActiveLoan } from '@/lib/loans'
+import { minimumRepayment, type ActiveLoan } from '@/lib/loans'
 import { fmt } from '@/lib/money'
 import { shortDate } from '@/lib/dates'
 import type { Deduction, EntryForm } from '@/types'
@@ -38,8 +38,8 @@ function suggested(loan: ActiveLoan): number {
 
 function loanSub(loan: ActiveLoan | null, kind: string): string {
   if (!loan) return `No active ${kind} loan`
-  const next = loan.count + 1
-  return `${fmt(loan.balance)} owed · installment ${next} of ${loan.months} · due ${shortDate(loan.deadline)}`
+  const rule = loan.type === 'gumbato' ? `any amount up to ${fmt(loan.balance)}` : `minimum ${fmt(minimumRepayment(loan))}, up to ${fmt(loan.balance)}`
+  return `${fmt(loan.balance)} owed · ${rule} · installment ${loan.count + 1} of ${loan.months} · due ${shortDate(loan.deadline)}`
 }
 
 export default function EntryPanel(props: EntryPanelProps) {
@@ -106,7 +106,7 @@ export default function EntryPanel(props: EntryPanelProps) {
             disabled={!st}
             active={target === 'repayST'}
             onSelect={() => setTarget('repayST')}
-            action={st ? { label: `Fill ${fmt(suggested(st))}`, onClick: () => onFill('repayST', suggested(st)) } : undefined}
+            action={st ? { label: `Suggested ${fmt(suggested(st))}`, onClick: () => onFill('repayST', suggested(st)) } : undefined}
           />
           <AllocationRow
             icon="repay"
@@ -116,7 +116,7 @@ export default function EntryPanel(props: EntryPanelProps) {
             disabled={!lt}
             active={target === 'repayLT'}
             onSelect={() => setTarget('repayLT')}
-            action={lt ? { label: `Fill ${fmt(suggested(lt))}`, onClick: () => onFill('repayLT', suggested(lt)) } : undefined}
+            action={lt ? { label: `Min ${fmt(minimumRepayment(lt))}`, onClick: () => onFill('repayLT', minimumRepayment(lt)) } : undefined}
           />
           {loanActions}
         </Card>
