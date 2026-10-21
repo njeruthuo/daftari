@@ -44,7 +44,7 @@ export default function EntryFooter({ math, error, note, onNote, nextLabel, onSa
       <Icon name={blocked || under ? 'warn' : 'check'} size={28} className={titleColor} />
       <div className="min-w-0 flex-1">
         <div className={`text-[17px] font-bold ${titleColor}`}>{title}</div>
-        <div className="truncate text-[13px] text-ink-2">{eq}</div>
+        <div className="truncate text-[13px] text-ink-2">{math.cash === 0 ? 'Deductions and savings fill in as you type' : eq}</div>
       </div>
       <label className="hidden md:block">
         <span className="sr-only">Note</span>

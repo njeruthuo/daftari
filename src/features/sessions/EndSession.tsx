@@ -6,7 +6,7 @@ import TopBar, { TaskScreen } from '@/components/layout/TopBar'
 import { AmountField, Banner, Button, Card, CardHeader, Icon, Keypad, MathRows, SectionLabel, TextArea, applyKey } from '@/components/ui'
 import { selectCurrentOfficial } from '@/features/auth/authSlice'
 import { formatDate, formatTime } from '@/lib/dates'
-import { fmt, kes, toNumber } from '@/lib/money'
+import { count as plural, fmt, kes, toNumber } from '@/lib/money'
 import { closeSession, setCount } from './sessionsSlice'
 import TotalsCard from './TotalsCard'
 import { useSessionData } from './useSessionData'
@@ -61,12 +61,12 @@ export default function EndSession() {
             </Banner>
           ) : (
             (processed < memberCount || draftCount > 0) && (
-              <Banner tone="warn" title={`${memberCount - processed} members not processed`}>
-                {draftCount > 0 ? `${draftCount} drafts are not saved and will be discarded on close. ` : ''}Go back to the workspace to finish them, or close anyway.
+              <Banner tone="warn" title={`${plural(memberCount - processed, 'member', 'members')} not processed`}>
+                {draftCount > 0 ? `${plural(draftCount, 'draft is', 'drafts are')} not saved and will be discarded on close. ` : ''}Go back to the workspace to finish them, or close anyway.
               </Banner>
             )
           )}
-          {unsynced > 0 && <Banner tone="warn">{unsynced} entries are saved on this tablet and still waiting to sync.</Banner>}
+          {unsynced > 0 && <Banner tone="warn">{plural(unsynced, 'entry is', 'entries are')} saved on this tablet and still waiting to sync.</Banner>}
           <TotalsCard totals={totals} entryCount={entries.length} />
         </div>
 

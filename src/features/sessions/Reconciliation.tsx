@@ -83,7 +83,7 @@ export default function Reconciliation() {
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatTile label="Expected cash" value={kes(totals.expected)} />
           <StatTile label="Counted" value={session.counted == null ? '—' : kes(session.counted)} />
-          <StatTile label="Variance" value={variance == null ? '—' : signed(variance)} tone={variance ? 'bad' : 'ok'} sub={variance == null ? 'Not counted yet' : variance < 0 ? 'Short' : variance > 0 ? 'Over' : 'Balanced'} />
+          <StatTile label="Variance" value={variance == null ? '—' : signed(variance)} tone={variance == null ? 'neutral' : variance ? 'bad' : 'ok'} sub={variance == null ? 'Not counted yet' : variance < 0 ? 'Short' : variance > 0 ? 'Over' : 'Balanced'} />
           <StatTile label="Entries" value={String(entries.length)} sub={`${flagged} flagged`} tone={flagged ? 'warn' : 'neutral'} />
         </div>
 

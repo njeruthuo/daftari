@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Navigate, useLocation } from 'react-router'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Avatar, Button, Icon, Keypad, StatusIcon, applyKey, type KeypadKey } from '@/components/ui'
 import { Logo } from '@/components/layout/SideNav'
 import { formatDate, formatTime } from '@/lib/dates'
+import { count } from '@/lib/money'
 import { unlock } from './authSlice'
 
 const PIN_LENGTH = 4
 
 export default function PinUnlock() {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
   const location = useLocation()
   const { group, members, officials } = useAppSelector((state) => state.data)
   const { memberId, lastMemberId } = useAppSelector((state) => state.auth)
@@ -20,7 +20,8 @@ export default function PinUnlock() {
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
 
-  if (memberId) return <Navigate to="/" replace />
+  const from = (location.state as { from?: string } | null)?.from ?? '/'
+  if (memberId) return <Navigate to={from} replace />
 
   const nameOf = (id: string) => members.find((m) => m.id === id)?.name ?? ''
   const official = officials.find((o) => o.memberId === selectedId) ?? officials[0]
@@ -33,7 +34,6 @@ export default function PinUnlock() {
     if (next.length < PIN_LENGTH) return
     if (next === official.pin) {
       dispatch(unlock(official.memberId))
-      navigate((location.state as { from?: string } | null)?.from ?? '/', { replace: true })
     } else {
       setError('Wrong PIN. Try again.')
       setPin('')
@@ -61,11 +61,10 @@ export default function PinUnlock() {
           <div className="flex flex-col gap-3 rounded-[14px] border border-navy-line bg-navy-2 p-5">
             <div className="flex items-center gap-2.5 text-[15px] font-semibold text-[#7ee2a4]">
               <StatusIcon status={waiting ? 'pending' : 'synced'} />
-              {waiting ? `${waiting} entries waiting to sync` : 'All entries synced'}
+              {waiting ? `${count(waiting, 'entry', 'entries')} waiting to sync` : 'All entries synced'}
             </div>
             <div className="text-sm leading-normal text-[#d3dae5]">
-              {lastSyncedAt ? `Last synced ${formatDate(lastSyncedAt)}, ${formatTime(lastSyncedAt)}.` : 'Not synced yet on this tablet.'} {waiting}{' '}
-              entries waiting on this tablet.
+              {lastSyncedAt ? `Last synced ${formatDate(lastSyncedAt)}, ${formatTime(lastSyncedAt)}.` : 'Not synced yet on this tablet.'} {count(waiting, 'entry', 'entries')} waiting on this tablet.
             </div>
             <div className="h-px bg-navy-line" />
             <div className="flex items-start gap-2.5 text-sm leading-normal text-[#d3dae5]">

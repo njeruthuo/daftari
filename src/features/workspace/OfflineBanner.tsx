@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Banner, Button, Icon } from '@/components/ui'
+import { count } from '@/lib/money'
 import { retrySync } from './ledgerSlice'
 
 // Shown in the workspace while offline or when uploads failed.
@@ -19,8 +20,8 @@ export default function OfflineBanner() {
   ) : undefined
 
   return (
-    <Banner tone={online ? 'bad' : 'warn'} title={online ? `${failed} entries failed to upload` : 'No internet — keep going.'} action={retry}>
-      Every Save is stored on this tablet first. {waiting} entries will upload automatically when the connection returns.
+    <Banner tone={online ? 'bad' : 'warn'} title={online ? `${count(failed, 'entry', 'entries')} failed to upload` : 'No internet — keep going.'} action={retry}>
+      Every Save is stored on this tablet first. {count(waiting, 'entry', 'entries')} will upload automatically when the connection returns.
     </Banner>
   )
 }

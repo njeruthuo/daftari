@@ -17,6 +17,11 @@ export function signed(amount: number): string {
   return '0'
 }
 
+// 1 -> "1 entry", 3 -> "3 entries"
+export function count(n: number, one: string, many: string): string {
+  return `${n} ${n === 1 ? one : many}`
+}
+
 // Keypad text ("3150", "") -> number
 export function toNumber(text: string | null | undefined): number {
   const n = parseInt(text ?? '', 10)

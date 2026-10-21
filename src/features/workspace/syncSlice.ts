@@ -1,11 +1,12 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { loadLastSyncedAt } from '@/app/storage'
 
 interface SyncState {
   online: boolean
   lastSyncedAt: string | null
 }
 
-const initialState: SyncState = { online: navigator.onLine, lastSyncedAt: null }
+const initialState: SyncState = { online: navigator.onLine, lastSyncedAt: loadLastSyncedAt() }
 
 const syncSlice = createSlice({
   name: 'sync',

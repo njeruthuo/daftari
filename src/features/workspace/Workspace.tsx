@@ -73,11 +73,15 @@ export default function Workspace() {
     else dispatch(saveDraft({ ...ref, form: next }))
   }
 
-  function select(memberId: string) {
-    if (drafts[member.id] && memberId !== member.id) show(`Draft kept for ${member.name}`, 'warn')
+  function goTo(memberId: string) {
     setSelectedId(memberId)
     setTarget('cash')
     setListOpen(false)
+  }
+
+  function select(memberId: string) {
+    if (drafts[member.id] && memberId !== member.id) show(`Draft kept for ${member.name}`, 'warn')
+    goTo(memberId)
   }
 
   function onKey(key: KeypadKey) {
@@ -127,7 +131,7 @@ export default function Workspace() {
     )
     dispatch(clearDraft({ sessionId, memberId: member.id }))
     show(`Saved ${member.name} · KES ${fmt(math.cash)}`)
-    if (next) select(next.member.id)
+    if (next) goTo(next.member.id)
   }
 
   const list = (

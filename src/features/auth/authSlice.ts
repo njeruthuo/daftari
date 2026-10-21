@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { loadUnlockedMemberId } from '@/app/storage'
 import type { RootState } from '@/app/store'
 
 interface AuthState {
@@ -6,7 +7,8 @@ interface AuthState {
   lastMemberId: string
 }
 
-const initialState: AuthState = { memberId: null, lastMemberId: 'M001' }
+const unlocked = loadUnlockedMemberId()
+const initialState: AuthState = { memberId: unlocked, lastMemberId: unlocked ?? 'M001' }
 
 const authSlice = createSlice({
   name: 'auth',

@@ -45,7 +45,7 @@ function loanSub(loan: ActiveLoan | null, kind: string): string {
 export default function EntryPanel(props: EntryPanelProps) {
   const { form, math, deductions, target, setTarget, onKey, onToggleDeduction, onFill, onAutoSavings, st, lt, loanActions } = props
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row">
+    <div className="flex flex-1 flex-col gap-3 lg:flex-row">
       <Card className="flex flex-col gap-2.5 p-3 lg:w-[300px] lg:shrink-0">
         <div className="flex items-center justify-between">
           <SectionLabel>Cash received</SectionLabel>
