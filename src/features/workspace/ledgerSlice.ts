@@ -26,6 +26,14 @@ const ledgerSlice = createSlice({
       }
       state.entries.push({ ...entry, id, loanId })
     },
+    // A correction: a new entry linked to the one it corrects. The original never changes.
+    postAdjustment(state, action: PayloadAction<NewEntry>) {
+      state.entries.push({ ...action.payload, id: `ADJ-${pad(state.nextAdjustment++)}` })
+    },
+    toggleFlag(state, action: PayloadAction<string>) {
+      const entry = state.entries.find((e) => e.id === action.payload)
+      if (entry) entry.flagged = !entry.flagged
+    },
     // Stand-in for the server upload until a backend exists.
     markAllSynced(state) {
       for (const e of state.entries) if (e.sync === 'pending') e.sync = 'synced'
@@ -38,7 +46,7 @@ const ledgerSlice = createSlice({
   },
 })
 
-export const { saveEntry, markAllSynced, retrySync } = ledgerSlice.actions
+export const { saveEntry, postAdjustment, toggleFlag, markAllSynced, retrySync } = ledgerSlice.actions
 
 export const selectEntries = (state: RootState) => state.ledger.entries
 export const selectLoans = (state: RootState) => state.ledger.loans
